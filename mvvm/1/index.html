@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>MVVM学习之旅</title>
+    <script src="../jq.js"></script>
+    <script src="Observer.js"></script>
+    <!--<script src="core.js"></script>-->
+    <script src="mvvm1.js"></script>
+</head>
+<body>
+
+<div id='box' vm-controller="boxCtr">
+    <div id='aa-attr' style="background: #a9ea00;width:100px;height:100px;" vm-css-width="width" vm-click='handelClick' >
+        aaa<span class="test"></span>
+    </div>
+    <p id='aa-text'>{{ width }}</p>
+</div>
+
+<script type="text/javascript">
+    var mm = MVVM.define("boxCtr", function(vm) {
+        vm.width = 150;
+        vm.handelClick = function() {
+            vm.width = parseFloat(vm.width) + 10;
+        }
+    })
+
+    MVVM.scanTag();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+<body>
+    <div id="app">
+        <p v-el:msg>messages: {{ messages | json }}</p>
+        <child v-ref:profile v-on:child-msg="handleIt"></child>
+    </div>
+
+    <template id="child-template">
+        <input v-model="msg" />
+        <button v-on:click="notify">Dispatch Event</button>
+    </template>
+
+
+    <div id="app2" v-demo:hello.a.b="msg">
+
+    </div>
+
+    <script src="../vue.js"></script>
+    <script>
+        Vue.component('child', {
+            template: '#child-template',
+            data: function (){
+                return {msg: 'hello'}
+            },
+            methods: {
+                notify: function (){
+                    this.$dispatch('child-msg', this.msg);      //事件名称小写
+                    this.msg = '';
+                }
+            }
+        })
+
+
+        var vm = new Vue({
+            el: '#app',
+            data: {
+                messages: [],
+                msg: 'hi'
+            },
+            methods: {
+                handleIt: function (msg) {   //调用$on
+                    this.messages.push(msg);
+                }
+            },
+            computed: {
+                example: {
+                    get: function (){
+                        return Date.now() + this.msg
+                    }
+                }
+            },
+            events: {
+                hello: function (){
+                    console.log('hello')
+                }
+            }
+        })
+
+
+
+
+        Vue.directive('demo', {
+            bind: function (){
+                console.log('demo bound')
+            },
+            update: function (value){
+                this.el.innerHTML =
+                        'name - '       + this.name + '<br>' +
+                        'expression - ' + this.expression + '<br>' +
+                        'argument - '   + this.arg + '<br>' +
+                        'modifiers - '  + JSON.stringify(this.modifiers) + '<br>' +
+                        'value - '      + value
+            }
+        })
+
+        var demo = new Vue({
+            el: '#app2',
+            data: {
+                msg: 'hello'
+            }
+        })
+
+    </script>
+</body>
+</html>

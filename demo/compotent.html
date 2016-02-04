@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+<style>
+    .expand-transition {
+        transition: all .3s ease;
+        height: 30px;
+        padding: 10px;
+        background-color: #eee;
+        overflow: hidden;
+    }
+    .expand-enter, .expand-leave {
+        height: 0;
+        padding: 0 10px;
+        opacity: 0;
+    }
+    hr {
+        margin:  30px 0;
+    }
+</style>
+<body>
+    <div id="app">
+        <parent-component msg="hello">
+
+        </parent-component>
+    </div>
+
+    <hr/>
+
+    <div id="app2">
+        <component :is="currentView" ></component>
+        <button @click="tabComponent">tab component</button>
+    </div>
+
+    <ul id="app3">
+        <item v-for="item in items" :item="item" :index="$index"></item>
+    </ul>
+
+    <script src="../vue.js"></script>
+<script>
+    var Child = Vue.extend({
+        props: {
+            childMsg: {
+                coerce: function (val){
+                    return val + 'coerce'
+                }
+            }
+        },
+        template: '<div v-on:click="test">parant msg is {{childMsg}}</div>' +
+        '<slot name="one"></slot>' +
+        '<slot></slot>' +
+        '<slot name="two"></slot>',
+        methods: {
+            test: function (){
+                console.log(this.$parent);
+                console.log(this.$root.a);
+            }
+        }
+    });
+
+    var Parent = Vue.extend({
+        props: ['msg'],
+        template: '<h1>Parent</h1>' +
+        '<p><input v-model="msg"/></p>' +
+        '<div>' +
+        '<my-component :child-msg="msg">' +
+            '<p slot="one">one</p>' +
+            '<p slot="two">two</p>' +
+            '<p>Default A</p>' +
+        '</my-component></div>',
+        components: {
+            'my-component': Child
+        }
+    })
+
+    Vue.component('parent-component', Parent);
+
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            a: 1
+        }
+    })
+
+
+    /*组件动态切换*/
+    var Home = Vue.component('home', {
+        template: '<div>00</div>',
+        activate: function (done){
+            setTimeout(function (){
+                done()
+            }, 1000)
+        }
+    })
+
+    var About = Vue.component('about', {
+        template: '<div>this is about</div>'
+    })
+    new Vue({
+        el: '#app2',
+        data: {
+            currentView: 'home'
+        },
+        components: {
+            home: Home,
+            about: About
+        },
+        methods: {
+            tabComponent: function (){
+                this.currentView = this.currentView === 'home' ? 'about': 'home';
+                console.log(this.currentView )
+            }
+        }
+    })
+
+
+    var Item = Vue.component('item', {
+        props: ['item', 'index'],
+        data: function (){
+            return {name: '列表项'}
+        },
+        template: '<li>{{name}}{{item}}的索引是{{index}}</li>'
+    })
+
+    new Vue({
+        el: '#app3',
+        data: {
+            items: ['a', 'b', 'c', 'd']
+        }
+    })
+</script>
+</body>
+</html>
